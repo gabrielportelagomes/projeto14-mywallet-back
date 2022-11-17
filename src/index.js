@@ -33,6 +33,7 @@ try {
 
 db = mongoClient.db("myWallet");
 const usersCollection = db.collection("users");
+const sessionsCollection = db.collection("sessions");
 
 app.post("/sign-up", async (req, res) => {
   const user = req.body;
@@ -53,6 +54,36 @@ app.post("/sign-up", async (req, res) => {
     const hashPassword = bcrypt.hashSync(user.password, 12);
     await usersCollection.insertOne({ ...user, password: hashPassword });
     res.sendStatus(201);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
+
+app.post("/sign-in", async (req, res) => {
+  const { email, password } = req.body;
+
+  const token = uuidV4();
+
+  try {
+    const registeredUser = await usersCollection.findOne({ email });
+
+    if (!registeredUser) {
+      return res.status(401).send({ message: "E-mail não cadastrado!" });
+    }
+
+    const passwordCheck = bcrypt.compareSync(password, registeredUser.password);
+
+    if (!passwordCheck) {
+      return res.sendStatus(401);
+    }
+
+    await sessionsCollection.insertOne({
+      token,
+      userId: registeredUser._id,
+    });
+
+    res.send({ token });
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
