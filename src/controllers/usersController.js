@@ -67,9 +67,7 @@ export async function deleteSignOut(req, res) {
   }
 
   try {
-    /* const session = await sessionsCollection.findOne({ token }); */
-
-    await sessionsCollection.deleteOne(/* { _id: session._id } */ { token });
+    await sessionsCollection.deleteOne({ token });
 
     res.sendStatus(201);
   } catch (err) {
