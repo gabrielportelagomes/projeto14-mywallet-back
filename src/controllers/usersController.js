@@ -56,3 +56,24 @@ export async function postSignIn(req, res) {
     res.sendStatus(500);
   }
 }
+
+export async function deleteSignOut(req, res) {
+  const { authorization } = req.headers;
+
+  const token = authorization?.replace("Bearer ", "");
+
+  if (!token) {
+    return res.sendStatus(401);
+  }
+
+  try {
+    /* const session = await sessionsCollection.findOne({ token }); */
+
+    await sessionsCollection.deleteOne(/* { _id: session._id } */ { token });
+
+    res.sendStatus(201);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+}

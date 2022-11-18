@@ -3,7 +3,11 @@ import cors from "cors";
 import { MongoClient, ObjectId } from "mongodb";
 import dotenv from "dotenv";
 import joi from "joi";
-import { postSignUp, postSignIn } from "./controllers/usersController.js";
+import {
+  postSignUp,
+  postSignIn,
+  deleteSignOut,
+} from "./controllers/usersController.js";
 
 export const userSchema = joi.object({
   name: joi.string().required().min(3).max(100),
@@ -35,6 +39,8 @@ export const sessionsCollection = db.collection("sessions");
 app.post("/sign-up", postSignUp);
 
 app.post("/sign-in", postSignIn);
+
+app.delete("/sign-out", deleteSignOut);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`Server running in port: ${port}`));
