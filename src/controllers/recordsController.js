@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import {
   usersCollection,
   sessionsCollection,
@@ -35,7 +36,7 @@ export async function postRecord(req, res) {
 
     const newRecord = {
       ...record,
-      date: new Date(),
+      date: dayjs().format("DD/MM/YYYY"),
       userId: user._id,
     };
 
