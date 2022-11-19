@@ -36,11 +36,11 @@ export async function postRecord(req, res) {
 
     const newRecord = {
       ...record,
-      date: dayjs().format("DD/MM/YYYY"),
+      date: "19/11/2023",
       userId: user._id,
     };
 
-     await recordsCollection.insertOne(newRecord);
+    await recordsCollection.insertOne(newRecord);
 
     res.sendStatus(201);
   } catch (err) {
@@ -73,7 +73,18 @@ export async function getRecords(req, res) {
       .find({ userId: user._id })
       .toArray();
 
-    res.send(records);
+    const monthRecords = records
+      .filter((record) => {
+        if (
+          record.date.split("/")[1] + "/" + record.date.split("/")[2] ===
+          dayjs().format("MM/YYYY")
+        ) {
+          return record;
+        }
+      })
+      .reverse();
+
+    res.send(monthRecords);
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
