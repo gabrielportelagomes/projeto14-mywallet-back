@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import {
   usersCollection,
   sessionsCollection,
@@ -33,7 +34,11 @@ export async function postRecord(req, res) {
       return res.sendStatus(401);
     }
 
-    const newRecord = { ...record, userId: user._id };
+    const newRecord = {
+      ...record,
+      date: dayjs().format("DD/MM"),
+      userId: user._id,
+    };
 
     await recordsCollection.insertOne(newRecord);
 
@@ -64,7 +69,9 @@ export async function getRecords(req, res) {
       return res.sendStatus(401);
     }
 
-    const records = await recordsCollection.find({userId: user._id}).toArray();
+    const records = await recordsCollection
+      .find({ userId: user._id })
+      .toArray();
 
     res.send(records);
   } catch (err) {
