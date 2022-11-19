@@ -36,7 +36,7 @@ export async function postRecord(req, res) {
 
     const newRecord = {
       ...record,
-      date: "19/11/2023",
+      date: dayjs().format("DD/MM/YYYY"),
       userId: user._id,
     };
 
