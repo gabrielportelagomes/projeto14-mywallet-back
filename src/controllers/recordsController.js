@@ -1,4 +1,8 @@
-import { usersCollection, sessionsCollection, recordsCollection } from "../database/db.js";
+import {
+  usersCollection,
+  sessionsCollection,
+  recordsCollection,
+} from "../database/db.js";
 import { recordSchema } from "../index.js";
 
 export async function postRecord(req, res) {
@@ -21,20 +25,15 @@ export async function postRecord(req, res) {
 
     const session = await sessionsCollection.findOne({ token });
 
-    console.log(session);
-
     const user = await usersCollection.findOne({
       _id: session?.userId,
     });
-    console.log(user);
 
     if (!user) {
       return res.sendStatus(401);
     }
 
     const newRecord = { ...record, userId: user._id };
-
-    console.log(newRecord);
 
     await recordsCollection.insertOne(newRecord);
 
