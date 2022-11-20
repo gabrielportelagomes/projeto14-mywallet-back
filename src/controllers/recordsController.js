@@ -127,3 +127,52 @@ export async function deleteRecord(req, res) {
     res.sendStatus(500);
   }
 }
+
+export async function putRecord(req, res) {
+  const { authorization } = req.headers;
+  const id = req.params.id;
+  const record = req.body;
+
+  const token = authorization?.replace("Bearer ", "");
+
+  if (!token) {
+    return res.sendStatus(401);
+  }
+
+  try {
+    const { error } = recordSchema.validate(record, { abortEarly: false });
+
+    if (error) {
+      const errorDetails = error.details.map((detail) => detail.message);
+      return res.status(400).send(errorDetails);
+    }
+
+    const session = await sessionsCollection.findOne({ token });
+
+    const user = await usersCollection.findOne({
+      _id: session?.userId,
+    });
+
+    if (!user) {
+      return res.sendStatus(401);
+    }
+
+    const registeredRecord = await recordsCollection.findOne({
+      _id: ObjectID(id),
+    });
+
+    if (registeredRecord.userId.toString() !== user._id.toString()) {
+      return res.sendStatus(401);
+    }
+
+    await recordsCollection.updateOne(
+      { _id: new ObjectID(id) },
+      { $set: record }
+    );
+
+    res.sendStatus(201);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+}
