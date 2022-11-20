@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { v4 as uuidV4 } from "uuid";
 import { userSchema } from "../index.js";
-import {usersCollection, sessionsCollection} from "../database/db.js"
+import { usersCollection, sessionsCollection } from "../database/db.js";
 
 export async function postSignUp(req, res) {
   const user = req.body;
@@ -52,6 +52,29 @@ export async function postSignIn(req, res) {
     });
 
     res.send({ token });
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+}
+
+export async function getUser(req, res) {
+  const { authorization } = req.headers;
+
+  console.log("oi");
+
+  const token = authorization?.replace("Bearer ", "");
+
+  if (!token) {
+    return res.sendStatus(401);
+  }
+
+  try {
+    const session = await sessionsCollection.findOne({ token });
+    const user = await usersCollection.findOne({ _id: session.userId });
+    delete user.password;
+
+    res.send(user);
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
