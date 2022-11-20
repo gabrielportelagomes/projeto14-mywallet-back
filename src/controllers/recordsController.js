@@ -1,3 +1,4 @@
+import { ObjectID } from "bson";
 import dayjs from "dayjs";
 import {
   usersCollection,
@@ -85,6 +86,42 @@ export async function getRecords(req, res) {
       .reverse();
 
     res.send(monthRecords);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+}
+
+export async function deleteRecord(req, res) {
+  const { authorization } = req.headers;
+  const id = req.params.id;
+
+  const token = authorization?.replace("Bearer ", "");
+
+  if (!token) {
+    return res.sendStatus(401);
+  }
+
+  try {
+    const session = await sessionsCollection.findOne({ token });
+
+    const user = await usersCollection.findOne({
+      _id: session?.userId,
+    });
+
+    if (!user) {
+      return res.sendStatus(401);
+    }
+
+    const record = await recordsCollection.findOne({ _id: ObjectID(id) });
+
+    if (record.userId.toString() !== user._id.toString()) {
+      return res.sendStatus(401);
+    }
+
+    await recordsCollection.deleteOne({ _id: ObjectID(id) });
+
+    res.sendStatus(201);
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
