@@ -1,7 +1,6 @@
 import { ObjectID } from "bson";
 import dayjs from "dayjs";
 import { recordsCollection } from "../database/db.js";
-import { recordSchema } from "../index.js";
 
 export async function postRecord(req, res) {
   const record = res.locals.record;
@@ -50,16 +49,9 @@ export async function getRecords(req, res) {
 }
 
 export async function deleteRecord(req, res) {
-  const id = req.params.id;
-  const user = res.locals.user;
+  const id = res.locals.recordId;
 
   try {
-    const record = await recordsCollection.findOne({ _id: ObjectID(id) });
-
-    if (record.userId.toString() !== user._id.toString()) {
-      return res.sendStatus(401);
-    }
-
     await recordsCollection.deleteOne({ _id: ObjectID(id) });
 
     res.sendStatus(201);
@@ -70,19 +62,10 @@ export async function deleteRecord(req, res) {
 }
 
 export async function putRecord(req, res) {
-  const id = req.params.id;
   const record = res.locals.record;
-  const user = res.locals.user;
+  const id = res.locals.recordId;
 
   try {
-    const registeredRecord = await recordsCollection.findOne({
-      _id: ObjectID(id),
-    });
-
-    if (registeredRecord.userId.toString() !== user._id.toString()) {
-      return res.sendStatus(401);
-    }
-
     await recordsCollection.updateOne(
       { _id: new ObjectID(id) },
       { $set: record }
