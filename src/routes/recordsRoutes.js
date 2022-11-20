@@ -5,8 +5,11 @@ import {
   deleteRecord,
   putRecord,
 } from "../controllers/recordsController.js";
+import { authValidation } from "../middlewares/authValidationMiddleware.js";
 
 const router = Router();
+
+router.use(authValidation);
 
 router.post("/records", postRecord);
 

@@ -8,14 +8,8 @@ import {
 import { recordSchema } from "../index.js";
 
 export async function postRecord(req, res) {
-  const { authorization } = req.headers;
   const record = req.body;
-
-  const token = authorization?.replace("Bearer ", "");
-
-  if (!token) {
-    return res.sendStatus(401);
-  }
+  const user = res.locals.user;
 
   try {
     const { error } = recordSchema.validate(record, { abortEarly: false });
@@ -23,16 +17,6 @@ export async function postRecord(req, res) {
     if (error) {
       const errorDetails = error.details.map((detail) => detail.message);
       return res.status(400).send(errorDetails);
-    }
-
-    const session = await sessionsCollection.findOne({ token });
-
-    const user = await usersCollection.findOne({
-      _id: session?.userId,
-    });
-
-    if (!user) {
-      return res.sendStatus(401);
     }
 
     const newRecord = {
@@ -51,25 +35,9 @@ export async function postRecord(req, res) {
 }
 
 export async function getRecords(req, res) {
-  const { authorization } = req.headers;
-
-  const token = authorization?.replace("Bearer ", "");
-
-  if (!token) {
-    return res.sendStatus(401);
-  }
+  const user = res.locals.user;
 
   try {
-    const session = await sessionsCollection.findOne({ token });
-
-    const user = await usersCollection.findOne({
-      _id: session?.userId,
-    });
-
-    if (!user) {
-      return res.sendStatus(401);
-    }
-
     const records = await recordsCollection
       .find({ userId: user._id })
       .toArray();
@@ -93,26 +61,10 @@ export async function getRecords(req, res) {
 }
 
 export async function deleteRecord(req, res) {
-  const { authorization } = req.headers;
   const id = req.params.id;
-
-  const token = authorization?.replace("Bearer ", "");
-
-  if (!token) {
-    return res.sendStatus(401);
-  }
+  const user = res.locals.user;
 
   try {
-    const session = await sessionsCollection.findOne({ token });
-
-    const user = await usersCollection.findOne({
-      _id: session?.userId,
-    });
-
-    if (!user) {
-      return res.sendStatus(401);
-    }
-
     const record = await recordsCollection.findOne({ _id: ObjectID(id) });
 
     if (record.userId.toString() !== user._id.toString()) {
@@ -129,15 +81,9 @@ export async function deleteRecord(req, res) {
 }
 
 export async function putRecord(req, res) {
-  const { authorization } = req.headers;
   const id = req.params.id;
   const record = req.body;
-
-  const token = authorization?.replace("Bearer ", "");
-
-  if (!token) {
-    return res.sendStatus(401);
-  }
+  const user = res.locals.user;
 
   try {
     const { error } = recordSchema.validate(record, { abortEarly: false });
@@ -145,16 +91,6 @@ export async function putRecord(req, res) {
     if (error) {
       const errorDetails = error.details.map((detail) => detail.message);
       return res.status(400).send(errorDetails);
-    }
-
-    const session = await sessionsCollection.findOne({ token });
-
-    const user = await usersCollection.findOne({
-      _id: session?.userId,
-    });
-
-    if (!user) {
-      return res.sendStatus(401);
     }
 
     const registeredRecord = await recordsCollection.findOne({
