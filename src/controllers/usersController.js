@@ -61,8 +61,6 @@ export async function postSignIn(req, res) {
 export async function getUser(req, res) {
   const { authorization } = req.headers;
 
-  console.log("oi");
-
   const token = authorization?.replace("Bearer ", "");
 
   if (!token) {
