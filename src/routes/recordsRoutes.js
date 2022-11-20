@@ -3,7 +3,7 @@ import {postRecord, getRecords} from "../controllers/recordsController.js"
 
 const router = Router();
 
-router.post("/record", postRecord);
-router.get("/record", getRecords);
+router.post("/records", postRecord);
+router.get("/records", getRecords);
 
 export default router;
