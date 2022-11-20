@@ -1,24 +1,13 @@
 import { ObjectID } from "bson";
 import dayjs from "dayjs";
-import {
-  usersCollection,
-  sessionsCollection,
-  recordsCollection,
-} from "../database/db.js";
+import { recordsCollection } from "../database/db.js";
 import { recordSchema } from "../index.js";
 
 export async function postRecord(req, res) {
-  const record = req.body;
+  const record = res.locals.record;
   const user = res.locals.user;
 
   try {
-    const { error } = recordSchema.validate(record, { abortEarly: false });
-
-    if (error) {
-      const errorDetails = error.details.map((detail) => detail.message);
-      return res.status(400).send(errorDetails);
-    }
-
     const newRecord = {
       ...record,
       date: dayjs().format("DD/MM/YYYY"),
@@ -82,17 +71,10 @@ export async function deleteRecord(req, res) {
 
 export async function putRecord(req, res) {
   const id = req.params.id;
-  const record = req.body;
+  const record = res.locals.record;
   const user = res.locals.user;
 
   try {
-    const { error } = recordSchema.validate(record, { abortEarly: false });
-
-    if (error) {
-      const errorDetails = error.details.map((detail) => detail.message);
-      return res.status(400).send(errorDetails);
-    }
-
     const registeredRecord = await recordsCollection.findOne({
       _id: ObjectID(id),
     });
