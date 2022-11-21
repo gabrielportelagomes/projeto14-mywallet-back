@@ -3,6 +3,7 @@ import { v4 as uuidV4 } from "uuid";
 import { signUpSchema } from "../models/signUpModel.js";
 import { signInSchema } from "../models/signInModel.js";
 import { usersCollection, sessionsCollection } from "../database/db.js";
+import { ObjectId } from "mongodb";
 
 export async function postSignUp(req, res) {
   const user = req.body;
@@ -67,19 +68,9 @@ export async function postSignIn(req, res) {
 }
 
 export async function getUser(req, res) {
-  const { authorization } = req.headers;
-
-  const token = authorization?.replace("Bearer ", "");
-
-  if (!token) {
-    return res.sendStatus(401);
-  }
+  const user = res.locals.user;
 
   try {
-    const session = await sessionsCollection.findOne({ token });
-    const user = await usersCollection.findOne({ _id: session.userId });
-    delete user.password;
-
     res.send(user);
   } catch (err) {
     console.log(err);
@@ -88,16 +79,10 @@ export async function getUser(req, res) {
 }
 
 export async function deleteSignOut(req, res) {
-  const { authorization } = req.headers;
-
-  const token = authorization?.replace("Bearer ", "");
-
-  if (!token) {
-    return res.sendStatus(401);
-  }
+  const user = res.locals.user;
 
   try {
-    await sessionsCollection.deleteOne({ token });
+    await sessionsCollection.deleteOne({ userId: ObjectId(user._id) });
 
     res.sendStatus(201);
   } catch (err) {

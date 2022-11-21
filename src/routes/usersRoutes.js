@@ -5,6 +5,7 @@ import {
   getUser,
   deleteSignOut,
 } from "../controllers/usersController.js";
+import { authValidation } from "../middlewares/authValidationMiddleware.js";
 
 const router = Router();
 
@@ -12,8 +13,8 @@ router.post("/sign-up", postSignUp);
 
 router.post("/sign-in", postSignIn);
 
-router.get("/users", getUser);
+router.get("/users", authValidation, getUser);
 
-router.delete("/sign-out", deleteSignOut);
+router.delete("/sign-out", authValidation, deleteSignOut);
 
 export default router;
