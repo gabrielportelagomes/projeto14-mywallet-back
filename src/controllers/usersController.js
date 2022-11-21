@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import { v4 as uuidV4 } from "uuid";
-import { userSchema } from "../index.js";
+import { signUpSchema } from "../models/signUpModel.js";
 import { usersCollection, sessionsCollection } from "../database/db.js";
 
 export async function postSignUp(req, res) {
@@ -12,7 +12,7 @@ export async function postSignUp(req, res) {
       return res.status(409).send({ message: "E-mail já cadastrado!" });
     }
 
-    const { error } = userSchema.validate(user, { abortEarly: false });
+    const { error } = signUpSchema.validate(user, { abortEarly: false });
 
     if (error) {
       const errorDetails = error.details.map((detail) => detail.message);

@@ -1,4 +1,4 @@
-import { recordSchema } from "../index.js";
+import { recordSchema } from "../models/recordModel.js";
 
 export async function recordValidation(req, res, next) {
   const record = req.body;
