@@ -1,22 +1,23 @@
 import bcrypt from "bcrypt";
 import { v4 as uuidV4 } from "uuid";
 import { signUpSchema } from "../models/signUpModel.js";
+import { signInSchema } from "../models/signInModel.js";
 import { usersCollection, sessionsCollection } from "../database/db.js";
 
 export async function postSignUp(req, res) {
   const user = req.body;
 
+  const { error } = signUpSchema.validate(user, { abortEarly: false });
+
+  if (error) {
+    const errorDetails = error.details.map((detail) => detail.message);
+    return res.status(400).send(errorDetails);
+  }
+
   try {
     const registeredUser = await usersCollection.findOne({ email: user.email });
     if (registeredUser) {
       return res.status(409).send({ message: "E-mail já cadastrado!" });
-    }
-
-    const { error } = signUpSchema.validate(user, { abortEarly: false });
-
-    if (error) {
-      const errorDetails = error.details.map((detail) => detail.message);
-      return res.status(400).send(errorDetails);
     }
 
     const hashPassword = bcrypt.hashSync(user.password, 12);
@@ -30,6 +31,13 @@ export async function postSignUp(req, res) {
 
 export async function postSignIn(req, res) {
   const { email, password } = req.body;
+
+  const { error } = signInSchema.validate(req.body, { abortEarly: false });
+
+  if (error) {
+    const errorDetails = error.details.map((detail) => detail.message);
+    return res.status(400).send(errorDetails);
+  }
 
   const token = uuidV4();
 
