@@ -5,7 +5,7 @@ export async function authValidation(req, res, next) {
   const token = authorization?.replace("Bearer ", "");
 
   if (!token) {
-    return res.sendStatus(401);
+    return res.status(401).send("Sessão não encontrada!");
   }
 
   try {
@@ -16,7 +16,7 @@ export async function authValidation(req, res, next) {
     });
 
     if (!user) {
-      return res.sendStatus(401);
+      return res.status(401).send("Usuário não encontrado!");
     }
 
     delete user.password;

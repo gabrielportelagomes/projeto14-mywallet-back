@@ -8,7 +8,7 @@ export async function recordIdValidation(req, res, next) {
     const record = await recordsCollection.findOne({ _id: ObjectID(id) });
 
     if (record.userId.toString() !== user._id.toString()) {
-      return res.sendStatus(401);
+      return res.status(401).send("Você não possui permisão para efetuar essa ação!");
     }
 
     res.locals.recordId = id;

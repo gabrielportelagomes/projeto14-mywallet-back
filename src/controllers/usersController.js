@@ -52,7 +52,7 @@ export async function postSignIn(req, res) {
     const passwordCheck = bcrypt.compareSync(password, registeredUser.password);
 
     if (!passwordCheck) {
-      return res.sendStatus(401);
+      return res.status(401).send({ message: "Senha incorreta!" });
     }
 
     await sessionsCollection.insertOne({
